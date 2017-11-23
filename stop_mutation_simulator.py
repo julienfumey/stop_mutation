@@ -15,16 +15,16 @@ def initData(seqLength):
         listePos.append({"seqSize":i,"freq":0.0,"nb":0}) #size,freq muta,nb muta
     return(listePos)
 
-def migrate(pos, param):
+def migrate(listePos, param):
     if param["txmigra"] != 0:
-        for i in pos:
-            if pos[i] > 0:
-                pos[i] *= (1-(npr.binomial(2*param["popSize"],param["txmigra"])/(2*param["popSize"])))
+        for pos in listePos:
+            if pos["freq"] > 0:
+                pos["freq"] *= (1-(npr.binomial(2*param["popSize"],param["txmigra"])/(2*param["popSize"])))
     elif random.random() < param["probMigra"]:
-        for i in pos:
-            if pos[i] > 0:
-                pos[i] *= (1-param["indMigra"])
-    return(pos)
+        for pos in listePos:
+            if pos["freq"] > 0:
+                pos["freq"] *= (1-param["indMigra"])
+    return(listePos)
 
 def evolve(pos, param):
     probMuta = param["txMut"] * pos["seqSize"] * param["freqMutaStop"] * 2*param["popSize"] * (1-pos["freq"])
@@ -88,7 +88,7 @@ for j in range(param["nbRepeats"]):
     for i in range(param["nbGeneration"]):
         for pos in listePos:
             pos = evolve(pos, param)
-        pos = migrate(pos, param)
+        listePos = migrate(listePos, param)
         if(i % 10 == 0):
             #print(i)
             b = [el["freq"] for el in listePos]

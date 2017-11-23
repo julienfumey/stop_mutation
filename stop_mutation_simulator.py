@@ -3,6 +3,7 @@
 import sys
 import random
 import numpy as np
+import numpy.random as npr
 import time
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -21,8 +22,8 @@ def evolve(pos, param):
         pos["nb"] += 1
     if(random.random() < param["probMigra"]):
         pos["freq"] = pos["freq"]*(1-param["indMigra"])
-    #print(pos["freq"])
-    pos["freq"] = sum(np.random.binomial(1,pos["freq"], 2*param["popSize"])) / (2*param["popSize"])
+    
+    pos["freq"] = npr.binomial(2*param["popSize"],pos["freq"]) / (2*param["popSize"])
     return(pos)
 
 def mutationCounter(listeFreq):

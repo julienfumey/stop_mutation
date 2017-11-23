@@ -88,7 +88,7 @@ for j in range(param["nbRepeats"]):
     for i in range(param["nbGeneration"]):
         for pos in listePos:
             pos = evolve(pos, param)
-            pos = migrate(pos, param)
+        pos = migrate(pos, param)
         if(i % 10 == 0):
             #print(i)
             b = [el["freq"] for el in listePos]

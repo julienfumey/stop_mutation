@@ -15,26 +15,22 @@ def initData(seqLength):
         listePos.append({"seqSize":i,"freq":0.0,"nb":0}) #size,freq muta,nb muta
     return(listePos)
 
-def migrate(freq, param):
+def migrate(pos, param):
     if param["txmigra"] != 0:
-        print(freq)
-        print("Migra L")
-        freq *= (1-(npr.binomial(2*param["popSize"],param["txmigra"])/(2*param["popSize"])))
-        print(freq)
+        for i in pos:
+            if pos[i] > 0:
+                pos[i] *= (1-(npr.binomial(2*param["popSize"],param["txmigra"])/(2*param["popSize"])))
     elif random.random() < param["probMigra"]:
-        print("Migra F")
-        freq *= (1-param["indMigra"])
-
-    return(freq)
+        for i in pos:
+            if pos[i] > 0:
+                pos[i] *= (1-param["indMigra"])
+    return(pos)
 
 def evolve(pos, param):
     probMuta = param["txMut"] * pos["seqSize"] * param["freqMutaStop"] * 2*param["popSize"] * (1-pos["freq"])
     if(random.random() < probMuta):
         pos["freq"] += 1/(2*param["popSize"])
         pos["nb"] += 1
-
-    if(pos["freq"] > 0):
-        pos["freq"] = migrate(pos["freq"], param)
 
     pos["freq"] = npr.binomial(2*param["popSize"],pos["freq"]) / (2*param["popSize"])
     return(pos)
@@ -92,6 +88,7 @@ for j in range(param["nbRepeats"]):
     for i in range(param["nbGeneration"]):
         for pos in listePos:
             pos = evolve(pos, param)
+            pos = migrate(pos, param)
         if(i % 10 == 0):
             #print(i)
             b = [el["freq"] for el in listePos]
@@ -99,10 +96,11 @@ for j in range(param["nbRepeats"]):
             countMutaMatrix[(i//10),mutationCounter(b)] += 1
 
 
-with PdfPages("simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"])) as pdf:
+print(countMutaMatrix)
+
+with PdfPages("simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"])) as pdf:
     for i in range((len(seqLength)+1)):
-        countMutaMatrix /= param["nbRepeats"]
-        plt.plot(countMutaMatrix[:,i], 'k-')
+        plt.plot(countMutaMatrix[:,i]/param["nbRepeats"], 'k-')
         plt.ylim([-0.05,1.05])
         plt.title("Probability of {} pseudogenes".format(i))
         pdf.savefig()

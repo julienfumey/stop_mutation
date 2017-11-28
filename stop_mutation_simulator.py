@@ -5,6 +5,8 @@ import random
 import numpy as np
 import numpy.random as npr
 import time
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import argparse
@@ -98,10 +100,12 @@ for j in range(param["nbRepeats"]):
 
 print(countMutaMatrix)
 
-with PdfPages("simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"])) as pdf:
+with PdfPages("graphe_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"])) as pdf:
     for i in range((len(seqLength)+1)):
         plt.plot(countMutaMatrix[:,i]/param["nbRepeats"], 'k-')
         plt.ylim([-0.05,1.05])
         plt.title("Probability of {} pseudogenes".format(i))
         pdf.savefig()
         plt.close()
+
+np.savetxt("out_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig.csv".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"]), countMutaMatrix, delimiter=",")

@@ -33,7 +33,7 @@ def drift(freq,popSize):
 
 def selection(freq,param,freqMigra):
     averageSelection = ((1-freq)**2)*(1-freqMigra) + freqMigra + 2*freq*(1-freq)*(1-param["h"]*param["fitness"])*(1-freqMigra) + (freq**2)*(1-param["fitness"])*(1-freqMigra)
-    newFreq = (((1-freq)**2)*(1-freqMigra)+freqMigra + freq*(1-freq)*(1-param["h"]*param["fitness"])*(1-freqMigra))/averageSelection
+    newFreq = ((freq**2)*(1-param["fitness"])*(1-freqMigra) + freq*(1-freq)*(1-param["h"]*param["fitness"])*(1-freqMigra))/averageSelection
     return(newFreq)
 
 def evolve(pos, param, freqMigra):
@@ -90,13 +90,10 @@ param = {"nbGeneration":args.generations,
 
 seqLength = (1050,1011,1056,1158,1059,1218,1056,966,861,945,1101,1221,1071,2802,1653,1227,2520,1062,1011,1146,1164,1227,2958,1197,1047,1881,891,882,1743)
 
-listePos = initData(seqLength)
-
-
+#listePos = initData(seqLength)
 
 dimension = (((param["nbGeneration"]//10)),(len(seqLength)+1))
 countMutaMatrix = np.zeros(dimension)
-#print(countMutaMatrix)
 tps1 = time.clock()
 for j in range(param["nbRepeats"]):
     sys.stderr.write("\rDoing repeat {} on {}".format(j,param["nbRepeats"]))
@@ -104,10 +101,10 @@ for j in range(param["nbRepeats"]):
     listePos = initData(seqLength)
     for i in range(param["nbGeneration"]):
         freqMigra = 0
-        if random.random() < param["probMigra"]:
-            freqMigra = param["indMigra"]
-        elif param["txmigra"] != 0:
+        if param["txmigra"] != 0:
             freqMigra = npr.binomial(2*param["popSize"],param["txmigra"])/(2*param["popSize"])
+        elif random.random() < param["probMigra"]:
+            freqMigra = param["indMigra"]
 
         for pos in listePos:
             pos = evolve(pos, param, freqMigra)
@@ -120,7 +117,7 @@ for j in range(param["nbRepeats"]):
 
 print(countMutaMatrix)
 
-with PdfPages("graphe_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"])) as pdf:
+with PdfPages("graphe_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig_{}_h_{}_s.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"], param["h"], param["fitness"])) as pdf:
     for i in range((len(seqLength)+1)):
         plt.plot(countMutaMatrix[:,i]/param["nbRepeats"], 'k-')
         plt.ylim([-0.05,1.05])
@@ -128,4 +125,4 @@ with PdfPages("graphe_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_
         pdf.savefig()
         plt.close()
 
-np.savetxt("out_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig.csv".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"]), countMutaMatrix, delimiter=",")
+np.savetxt("out_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig_{}_h_{}_s.csv".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"], param["h"], param["fitness"]), countMutaMatrix, delimiter=",")

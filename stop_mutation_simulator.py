@@ -120,6 +120,7 @@ print(countMutaMatrix)
 with PdfPages("graphe_simu_stop_{}_generations_{}_repeats_{}_mu_{}_ind_{}_migra_{}_migrants_{}_mig_{}_h_{}_s.pdf".format(param["nbGeneration"], param["nbRepeats"], param["txMut"], param["popSize"],param["probMigra"], param["indMigra"],param["txmigra"], param["h"], param["fitness"])) as pdf:
     for i in range((len(seqLength)+1)):
         plt.plot(countMutaMatrix[:,i]/param["nbRepeats"], 'k-')
+        plt.plot()
         plt.ylim([-0.05,1.05])
         plt.title("Probability of {} pseudogenes".format(i))
         pdf.savefig()
